@@ -37,8 +37,8 @@
   {% block body %}{% endblock %}
   {% if previews %}
   <nav class="preview-switcher" aria-label="Design previews">
-    <a href="../">All designs</a>
-    {% for name in previews %}<a href="../{{ name }}/"{% if name == theme %} aria-current="page"{% endif %}>{{ name }}</a>{% endfor %}
+    <a href="{{ preview_base }}">All designs</a>
+    {% for name in previews %}<a href="{{ preview_base }}{{ name }}/"{% if name == theme %} aria-current="page"{% endif %}>{{ name }}</a>{% endfor %}
   </nav>
   {% endif %}
   <script src="static/js/site.js?v={{ build_stamp }}" defer></script>

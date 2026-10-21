@@ -33,6 +33,7 @@ jobs:
           args: >-
             --no-progress --root-dir "${{ github.workspace }}/_site"
             --exclude "fonts\.(googleapis|gstatic)\.com" --exclude "doi\.org" --exclude "anaconda\.org"
+            --exclude "^https://bilby-dev\.github\.io/?$"
             "_site/**/*.html"
           fail: true
 

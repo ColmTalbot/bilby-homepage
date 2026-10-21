@@ -205,7 +205,9 @@ def load_context(offline):
     }
 
 
-def render_theme(theme, context, dest, previews=()):
+def render_theme(theme, context, dest, previews=(), preview_base="../"):
+    """Render one theme into dest. `preview_base` is the path from this page
+    to the preview index (the switcher's links), when `previews` are listed."""
     env = Environment(
         loader=FileSystemLoader([THEMES / theme, THEMES / "_shared"]),
         autoescape=True, trim_blocks=True, lstrip_blocks=True,
@@ -214,7 +216,7 @@ def render_theme(theme, context, dest, previews=()):
     env.filters["tojson_script"] = lambda v: json.dumps(v).replace("</", "<\\/")
     env.filters["groupby_ordered"] = groupby_ordered
     dest.mkdir(parents=True, exist_ok=True)
-    page_context = dict(context, theme=theme, previews=previews)
+    page_context = dict(context, theme=theme, previews=previews, preview_base=preview_base)
     (dest / "index.html").write_text(env.get_template("index.html").render(page_context))
     shutil.copytree(STATIC, dest / "static", dirs_exist_ok=True)
     for asset in (THEMES / theme).iterdir():
@@ -244,7 +246,7 @@ def build(all_themes=False, offline=False):
         shutil.rmtree(OUT)
     themes = available_themes()
     previews = themes if all_themes else ()
-    render_theme(context["site"]["theme"], context, OUT, previews)
+    render_theme(context["site"]["theme"], context, OUT, previews, preview_base="preview/")
     (OUT / ".nojekyll").touch()
     if all_themes:
         for theme in themes:
