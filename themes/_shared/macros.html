@@ -76,8 +76,8 @@
 </ol>
 {%- endmacro %}
 
-{% macro runner(examples, site, docs_label="Open the full examples site") -%}
-<div class="runner" data-runner data-state="idle" data-pyodide="{{ site.pyodide.version }}" data-packages='{{ site.pyodide.pyodide_packages | tojson }}'>
+{% macro runner(examples, site, release, docs_label="Open the full examples site") -%}
+<div class="runner" data-runner data-state="idle" data-pyodide="{{ site.pyodide.version }}" data-bilby="{{ release.version }}" data-packages='{{ site.pyodide.pyodide_packages | tojson }}'>
   <script type="application/json" data-runner-examples>{{ examples | tojson_script | safe }}</script>
   <div class="runner-bar">
     <label class="runner-picker">

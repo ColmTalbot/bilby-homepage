@@ -149,7 +149,7 @@
         }
       };
       const runner = await (await fetch(asset("../py/_runner.py"))).text();
-      worker.postMessage({ type: "init", pyodide: root.dataset.pyodide, packages, runner });
+      worker.postMessage({ type: "init", pyodide: root.dataset.pyodide, bilby: root.dataset.bilby, packages, runner });
     }
 
     async function run() {
