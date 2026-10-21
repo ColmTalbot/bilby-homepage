@@ -4,7 +4,6 @@
 {% extends "base.html" %}
 {% from "macros.html" import icon, ecosystem, banner, install_tabs, announcement_list, runner, citations, community_icon %}
 {% block theme_color %}#fbf8f2{% endblock %}
-{% block fonts %}https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap{% endblock %}
 {% block body %}
 <div class="utility">
   <div class="wrap utility-inner">
@@ -79,7 +78,7 @@
           <p>Choose an example, change anything you like, and run it. The code runs in your browser with <a href="https://pyodide.org">Pyodide</a>, so nothing leaves your computer.</p>
         </div>
       </div>
-      {{ runner(examples, site) }}
+      {{ runner(examples, site, release) }}
     </div>
   </section>
 
