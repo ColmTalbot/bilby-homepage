@@ -1,6 +1,9 @@
 # Checks pull requests (and, weekly, the live dependencies): the site builds,
 # its links work, and every in-browser example still runs with the newest
 # bilby under the configured Pyodide version.
+#
+# Actions are pinned to commit SHAs (the comment gives the release); Dependabot
+# updates both together.
 name: Check
 
 on:
@@ -18,8 +21,10 @@ jobs:
   build-and-links:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
           cache: pip
@@ -28,11 +33,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Check links
-        uses: lycheeverse/lychee-action@v2
+        uses: lycheeverse/lychee-action@e7477775783ea5526144ba13e8db5eec57747ce8 # v2.9.0
         with:
           args: >-
             --no-progress --root-dir "${{ github.workspace }}/_site"
-            --exclude "fonts\.(googleapis|gstatic)\.com" --exclude "doi\.org" --exclude "anaconda\.org"
+            --exclude "doi\.org" --exclude "anaconda\.org"
             --exclude "^https://bilby-dev\.github\.io/?$"
             "_site/**/*.html"
           fail: true
@@ -40,16 +45,22 @@ jobs:
   examples:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
-      - uses: actions/setup-python@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
-      - uses: actions/setup-node@v7
+          cache: pip
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
+      # PyYAML comes from requirements.txt; Pyodide's npm package is pinned to
+      # the exact version the site uses (content/site.yaml).
+      - run: pip install -r requirements.txt
+      # Exact version from site.yaml (its single source of truth), no install scripts.
       - name: Install the Pyodide version the site uses
-        run: |
-          pip install pyyaml
+        run: | # zizmor: ignore[adhoc-packages]
           VERSION=$(python -c "import yaml; print(yaml.safe_load(open('content/site.yaml'))['pyodide']['version'])")
-          npm install --no-save "pyodide@$VERSION"
+          npm install --no-save --ignore-scripts "pyodide@$VERSION"
       - run: node tests/run_examples.mjs
