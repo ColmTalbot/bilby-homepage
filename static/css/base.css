@@ -1,0 +1,201 @@
+/* Structure shared by every theme. Themes set the custom properties below
+   (and anything else) in their own style.css. */
+
+:root {
+  --code-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --code-bg: #0e2238;
+  --code-fg: #e4eef8;
+  --code-muted: #8aa6c1;
+  --code-border: #ffffff1a;
+  --code-panel: #0a1a2c;
+  --runner-accent: #5aa0dc;
+  --runner-accent-fg: #04111f;
+  --tok-k: #ff9fb5;
+  --tok-s: #a8e0a0;
+  --tok-c: #7f97ae;
+  --tok-n: #ffcf85;
+  --tok-f: #8fd0ff;
+  --tok-b: #c7a6ff;
+  --tok-d: #ffcf85;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+body { margin: 0; }
+img, svg, canvas { display: block; max-width: 100%; }
+img { height: auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+pre, code { font-family: var(--code-font); }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0s !important; transition-duration: 0s !important; }
+}
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; overflow: hidden;
+  clip: rect(0 0 0 0); white-space: nowrap; margin: -1px;
+}
+.skip-link {
+  position: absolute; left: 12px; top: -48px; z-index: 100; padding: 8px 14px;
+  background: #fff; color: #000; border-radius: 6px; transition: top .15s;
+}
+.skip-link:focus { top: 12px; }
+
+/* ----------------------------------------------------------- code tokens */
+.tok-k { color: var(--tok-k); }
+.tok-s { color: var(--tok-s); }
+.tok-c { color: var(--tok-c); font-style: italic; }
+.tok-n { color: var(--tok-n); }
+.tok-f { color: var(--tok-f); }
+.tok-b { color: var(--tok-b); }
+.tok-d { color: var(--tok-d); }
+
+.copy {
+  display: inline-grid; place-items: center; width: 34px; height: 34px; flex: none;
+  border: 0; border-radius: 8px; background: transparent; cursor: pointer; opacity: .75;
+  transition: opacity .15s, background .15s;
+}
+.copy:hover, .copy:focus-visible { opacity: 1; background: #8881; }
+.copy.copied { opacity: 1; }
+.copy.copied svg { display: none; }
+.copy.copied::after { content: "✓"; font-weight: 700; }
+
+/* ----------------------------------------------------------------- tabs */
+.install-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
+.install-tabs [role="tab"] { cursor: pointer; border: 0; background: none; }
+.install-panel { display: flex; align-items: center; gap: 8px; }
+.install-panel[hidden] { display: none; }
+.install-panel code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
+.install-panel .prompt { opacity: .5; user-select: none; }
+
+/* --------------------------------------------------------------- banner */
+.banner-inner { display: flex; align-items: center; gap: 12px; }
+.banner-text { flex: 1; min-width: 0; }
+.banner-close {
+  display: grid; place-items: center; width: 32px; height: 32px; flex: none;
+  border: 0; border-radius: 6px; background: none; color: inherit; cursor: pointer; opacity: .8;
+}
+.banner-close:hover { opacity: 1; background: #fff2; }
+
+/* ------------------------------------------------------------ news list */
+.news-list { list-style: none; margin: 0; padding: 0; }
+.news-body > :first-child { margin-top: 0; }
+.news-body > :last-child { margin-bottom: 0; }
+
+/* ------------------------------------------------------------- ecosystem */
+.eco-invite { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 28px 0 0; }
+.eco-invite > .icon { flex: none; }
+.eco-invite a { display: inline-flex; align-items: center; gap: 4px; font-weight: 600; }
+
+/* -------------------------------------------------------------- citations */
+.cite-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
+.cite-title, .cite-meta { margin: 0; }
+.cite-bibtex summary { cursor: pointer; width: max-content; }
+.cite-bibtex-body { position: relative; }
+.cite-bibtex-body pre {
+  margin: 8px 0 0; padding: 12px 44px 12px 14px; overflow-x: auto; font-size: .78rem; line-height: 1.5;
+  background: var(--code-bg); color: var(--code-fg); border-radius: 8px; white-space: pre;
+}
+.cite-bibtex-body .copy { position: absolute; top: 12px; right: 6px; color: var(--code-fg); }
+
+/* --------------------------------------------------------------- runner */
+.runner {
+  background: var(--code-bg); color: var(--code-fg); border: 1px solid var(--code-border);
+  border-radius: var(--runner-radius, 14px); overflow: hidden;
+  box-shadow: var(--runner-shadow, 0 20px 50px -20px #0007);
+}
+.runner-bar {
+  display: flex; align-items: center; gap: 8px; padding: 10px 12px;
+  border-bottom: 1px solid var(--code-border); background: var(--code-panel);
+}
+.runner-spacer { flex: 1; }
+.runner-picker select {
+  max-width: 100%; padding: 7px 30px 7px 12px; border-radius: 8px; cursor: pointer;
+  border: 1px solid var(--code-border); background: var(--code-bg); color: var(--code-fg);
+  appearance: none; font-size: .9rem;
+  background-image: linear-gradient(45deg, transparent 50%, currentColor 50%), linear-gradient(135deg, currentColor 50%, transparent 50%);
+  background-position: calc(100% - 15px) 52%, calc(100% - 10px) 52%;
+  background-size: 5px 5px; background-repeat: no-repeat;
+}
+.runner-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 8px;
+  border: 1px solid var(--code-border); background: transparent; color: var(--code-fg);
+  font-weight: 600; font-size: .9rem; cursor: pointer; transition: filter .15s, background .15s;
+}
+.runner-btn:hover { background: #ffffff12; }
+.runner-run { background: var(--runner-accent); color: var(--runner-accent-fg); border-color: transparent; }
+.runner-run:hover { background: var(--runner-accent); filter: brightness(1.1); }
+.runner-btn[hidden] { display: none; }
+.runner-body { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); min-height: 440px; }
+.runner-editor { position: relative; border-right: 1px solid var(--code-border); min-height: 440px; }
+.runner-highlight, .runner-editor textarea {
+  position: absolute; inset: 0; margin: 0; padding: 16px 18px; border: 0;
+  font-family: var(--code-font); font-size: 13.5px; line-height: 1.6; tab-size: 4;
+  white-space: pre; overflow: auto; overflow-wrap: normal; letter-spacing: 0;
+}
+.runner-highlight { pointer-events: none; color: var(--code-fg); scrollbar-width: none; }
+.runner-highlight::-webkit-scrollbar { display: none; }
+.runner-editor textarea {
+  resize: none; background: transparent; color: transparent; caret-color: var(--code-fg); outline: none;
+}
+.runner-editor textarea::selection { background: #5aa0dc55; color: transparent; }
+.runner-editor:focus-within { box-shadow: inset 0 0 0 2px var(--runner-accent); }
+.runner-output {
+  display: flex; flex-direction: column; gap: 12px; padding: 16px; min-width: 0;
+  max-height: 560px; overflow: auto;
+}
+.runner-status { margin: 0; font-size: .9rem; color: var(--code-muted); line-height: 1.5; }
+.runner-status[data-elapsed]::after { content: " · " attr(data-elapsed); opacity: .7; }
+.runner[data-state="loading"] .runner-status::before,
+.runner[data-state="running"] .runner-status::before {
+  content: ""; display: inline-block; width: .8em; height: .8em; margin-right: .5em; vertical-align: -.05em;
+  border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%;
+  animation: runner-spin .8s linear infinite;
+}
+.runner[data-state="error"] .runner-status { color: var(--tok-k); }
+@keyframes runner-spin { to { transform: rotate(1turn); } }
+.runner-figures { display: grid; gap: 12px; }
+.runner-figures:empty { display: none; }
+.runner-figures img { width: 100%; max-width: 440px; margin: auto; background: #fff; border-radius: 8px; }
+.runner-log {
+  margin: 0; padding: 12px; font-size: 12px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere;
+  background: #0003; border-radius: 8px; max-height: 220px; overflow: auto; color: var(--code-muted); flex: none;
+}
+.runner-foot { margin: 0; padding: 10px 16px; font-size: .82rem; color: var(--code-muted); border-top: 1px solid var(--code-border); }
+.runner-foot a { color: inherit; }
+@media (max-width: 760px) {
+  .runner-body { grid-template-columns: 1fr; }
+  .runner-editor { border-right: 0; border-bottom: 1px solid var(--code-border); min-height: 380px; }
+  .runner-output { max-height: none; }
+}
+
+/* ------------------------------------------------------------- watermark */
+/* Fixed in the viewport above the content; pointer-events: none keeps every
+   link and the code editor usable through it. A translucent fill rather than
+   an outline: system fonts build many glyphs from overlapping contours, and
+   -webkit-text-stroke draws each contour's edge, including the overlaps. */
+.watermark {
+  position: fixed; inset: 0; z-index: 80; display: grid; place-items: center;
+  pointer-events: none; user-select: none; overflow: hidden;
+}
+.watermark::before {
+  content: "Preliminary"; transform: rotate(-28deg); white-space: nowrap;
+  font: 800 clamp(3.5rem, 13vw, 12rem)/1 system-ui, sans-serif;
+  letter-spacing: .08em; text-transform: uppercase;
+  color: rgb(214 48 49 / .16);
+}
+@media print { .watermark { position: absolute; } }
+
+/* ------------------------------------------------------ preview switcher */
+.preview-switcher {
+  position: fixed; z-index: 90; bottom: 16px; left: 50%; transform: translateX(-50%);
+  display: flex; gap: 2px; padding: 4px; border-radius: 999px;
+  background: #0b1626e6; backdrop-filter: blur(8px); box-shadow: 0 6px 24px #0005;
+  font: 600 13px/1 system-ui, sans-serif; max-width: calc(100vw - 32px); overflow-x: auto;
+}
+body .preview-switcher a {
+  color: #cfe0f0; text-decoration: none; padding: 8px 14px; border-radius: 999px;
+  text-transform: capitalize; white-space: nowrap;
+}
+body .preview-switcher a:hover { background: #ffffff1a; }
+body .preview-switcher a[aria-current] { background: #fff; color: #0b2540; }

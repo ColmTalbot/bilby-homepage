@@ -1,0 +1,54 @@
+# Checks pull requests (and, weekly, the live dependencies): the site builds,
+# its links work, and every in-browser example still runs with the newest
+# bilby under the configured Pyodide version.
+name: Check
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "41 5 * * 1" # weekly
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-links:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python build.py --all
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: >-
+            --no-progress --root-dir "${{ github.workspace }}/_site"
+            --exclude "fonts\.(googleapis|gstatic)\.com" --exclude "doi\.org" --exclude "anaconda\.org"
+            "_site/**/*.html"
+          fail: true
+
+  examples:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install the Pyodide version the site uses
+        run: |
+          pip install pyyaml
+          VERSION=$(python -c "import yaml; print(yaml.safe_load(open('content/site.yaml'))['pyodide']['version'])")
+          npm install --no-save "pyodide@$VERSION"
+      - run: node tests/run_examples.mjs

@@ -1,0 +1,221 @@
+# Everything the homepage says lives in this file and in content/announcements/.
+# Edit text here; the templates in themes/ only control presentation.
+# The build (build.py) also fills in live data: the latest release from PyPI and
+# recent GitHub releases (see `automation` below).
+
+# Which design is deployed at the site root. The others are still built under
+# /preview/<name>/ when running `python build.py --all`.
+theme: contour
+
+# While true, every page shows a "PRELIMINARY" watermark and asks search
+# engines not to index it. Set to false (or delete the line) at launch.
+preliminary: true
+
+title: bilby
+url: https://bilby-dev.github.io
+tagline: Bayesian inference made simple.
+description: >-
+  bilby is a user-friendly Bayesian inference library for Python. Define a
+  likelihood and priors, pick any of a dozen samplers, and get posteriors and
+  evidences back, from fitting a straight line to measuring the masses of
+  merging black holes.
+
+links:
+  docs: https://bilby-dev.github.io/bilby/
+  examples: https://bilby-dev.github.io/examples/
+  github: https://github.com/bilby-dev/bilby
+  pypi: https://pypi.org/project/bilby/
+  conda: https://anaconda.org/conda-forge/bilby
+  issues: https://github.com/bilby-dev/bilby/issues
+  discussions: https://github.com/bilby-dev/bilby/discussions
+  changelog: https://github.com/bilby-dev/bilby/blob/main/CHANGELOG.md
+  install: https://bilby-dev.github.io/bilby/installation.html
+  citing: https://bilby-dev.github.io/bilby/citing-bilby.html
+  contributing: https://bilby-dev.github.io/bilby/contribution-guide.html
+
+nav:
+  - {label: Install, href: "https://bilby-dev.github.io/bilby/installation.html"}
+  - {label: Documentation, href: "https://bilby-dev.github.io/bilby/"}
+  - {label: Examples, href: "https://bilby-dev.github.io/examples/"}
+  - {label: Ecosystem, href: "#ecosystem"}
+  - {label: News, href: "#news"}
+  - {label: Community, href: "#community"}
+
+install:
+  - {name: pip, command: "pip install bilby"}
+  - {name: conda, command: "conda install -c conda-forge bilby"}
+  - {name: uv, command: "uv add bilby"}
+  - {name: "with GW extras", command: "pip install \"bilby[gw]\""}
+
+features:
+  - title: Any sampler, one interface
+    icon: shuffle
+    text: >-
+      Switch between dynesty, emcee, bilby-mcmc, nessai, ultranest, PyMC and more
+      by changing one keyword. Sampler plugins let anyone add their own.
+    href: https://bilby-dev.github.io/bilby/samplers.html
+  - title: Gravitational-wave ready
+    icon: wave
+    text: >-
+      bilby.gw provides waveforms, detector networks, calibration and
+      marginalised likelihoods. It underpins inference for LIGO-Virgo-KAGRA
+      catalogues.
+    href: https://bilby-dev.github.io/bilby/compact-binary-coalescence-parameter-estimation.html
+  - title: Priors that make sense
+    icon: prior
+    text: >-
+      A rich library of priors, including conditional, joint and constrained
+      distributions, that you combine with plain Python.
+    href: https://bilby-dev.github.io/bilby/prior.html
+  - title: Results you can share
+    icon: corner
+    text: >-
+      Corner plots, evidences, and portable result files in HDF5 or JSON, ready
+      for hierarchical and population analyses with bilby.hyper.
+    href: https://bilby-dev.github.io/bilby/bilby-output.html
+
+# Large link tiles ("Where next?"). Used most prominently by the field-guide design.
+destinations:
+  - {title: Getting started, text: "Install bilby and run your first fit.", href: "https://bilby-dev.github.io/bilby/basics-of-parameter-estimation.html", icon: rocket}
+  - {title: User guide, text: "Priors, likelihoods, samplers and output.", href: "https://bilby-dev.github.io/bilby/", icon: book}
+  - {title: Examples, text: "Runnable examples, in your browser.", href: "https://bilby-dev.github.io/examples/", icon: play}
+  - {title: API reference, text: "bilby.core, bilby.gw, bilby.hyper and more.", href: "https://bilby-dev.github.io/bilby/api/bilby.core.html", icon: code}
+  - {title: GW inference, text: "Compact binary coalescence parameter estimation.", href: "https://bilby-dev.github.io/bilby/compact-binary-coalescence-parameter-estimation.html", icon: wave}
+  - {title: Contribute, text: "Report bugs, write plugins, improve the docs.", href: "https://bilby-dev.github.io/bilby/contribution-guide.html", icon: heart}
+
+samplers:
+  - {name: dynesty, kind: nested}
+  - {name: bilby-mcmc, kind: MCMC}
+  - {name: emcee, kind: MCMC}
+  - {name: nessai, kind: nested + flows, href: "https://github.com/bilby-dev/nessai-bilby"}
+  - {name: ultranest, kind: nested, href: "https://github.com/bilby-dev/ultranest-bilby"}
+  - {name: PyMC, kind: HMC, href: "https://github.com/bilby-dev/pymc-bilby"}
+  - {name: zeus, kind: ensemble slice, href: "https://github.com/bilby-dev/zeus-bilby"}
+  - {name: ptemcee, kind: parallel tempering, href: "https://github.com/bilby-dev/ptemcee-bilby"}
+  - {name: PolyChord, kind: nested, href: "https://github.com/bilby-dev/pypolychord-bilby"}
+  - {name: MultiNest, kind: nested, href: "https://github.com/bilby-dev/pymultinest-bilby"}
+  - {name: nestle, kind: nested, href: "https://github.com/bilby-dev/nestle-bilby"}
+  - {name: DNest4, kind: diffusive nested, href: "https://github.com/bilby-dev/dnest4-bilby"}
+
+# Packages built on, or designed to work with, bilby. Each needs a name, a
+# one-line description, a link and a category; entries are grouped by category
+# in the order categories first appear. `repo` is optional.
+ecosystem:
+  intro: >-
+    bilby is the core of a family of packages for pipelines, population studies
+    and astrophysical transients.
+  # Shown under the list. Once the homepage repository exists, `href` could
+  # point at its issue tracker instead, so people can propose an entry directly.
+  invite:
+    text: Using bilby in your package? Let us know and we'll add it here.
+    link_text: Tell us about it
+    href: https://github.com/bilby-dev/bilby/discussions
+  packages:
+    - name: bilby_pipe
+      category: Gravitational waves
+      text: Configure and run bilby gravitational-wave analyses on a computing cluster from a single ini file.
+      href: https://lscsoft.docs.ligo.org/bilby_pipe/master/index.html
+      repo: https://git.ligo.org/lscsoft/bilby_pipe
+    - name: parallel_bilby
+      category: Gravitational waves
+      text: Run bilby gravitational-wave analyses across many CPUs with MPI.
+      href: https://lscsoft.docs.ligo.org/parallel_bilby/
+      repo: https://git.ligo.org/lscsoft/parallel_bilby
+    - name: bilby_tgr
+      category: Gravitational waves
+      text: Tests of general relativity with bilby.
+      href: https://lscsoft.docs.ligo.org/bilby_tgr/
+      repo: https://git.ligo.org/lscsoft/bilby_tgr
+    - name: gwpopulation
+      category: Populations
+      text: Hierarchical population inference for gravitational-wave catalogues, built on bilby.
+      href: https://colmtalbot.github.io/gwpopulation/
+      repo: https://github.com/ColmTalbot/gwpopulation
+    - name: redback
+      category: Transients
+      text: Bayesian inference and modelling of electromagnetic transients, built on bilby.
+      href: https://redback.readthedocs.io
+      repo: https://github.com/nikhil-sarin/redback
+    - name: PESummary
+      category: Results
+      text: Summary pages and plots for parameter-estimation results, including bilby's.
+      href: https://lscsoft.docs.ligo.org/pesummary/
+      repo: https://git.ligo.org/lscsoft/pesummary
+
+# Figures for the gallery section. The section is hidden while show_gallery
+# is false (or the list is empty); the entries are kept for when it returns.
+show_gallery: false
+gallery:
+  - {src: img/gallery-full_15_parameters_H1_waveform.jpg, caption: "Reconstructed GW150914-like signal and 90% credible band", href: "https://bilby-dev.github.io/bilby/compact-binary-coalescence-parameter-estimation.html"}
+  - {src: img/gallery-hyper_parameter_corner.jpg, caption: "Hyper-parameter posterior from a hierarchical model", href: "https://bilby-dev.github.io/bilby/hyperparameters.html"}
+  - {src: img/gallery-basic_tutorial_corner.jpg, caption: "Corner plot from the basic tutorial", href: "https://bilby-dev.github.io/bilby/basics-of-parameter-estimation.html"}
+  - {src: img/gallery-full_15_parameters_corner.jpg, caption: "Full 15-parameter binary black hole posterior", href: "https://bilby-dev.github.io/bilby/compact-binary-coalescence-parameter-estimation.html"}
+
+citation:
+  text: If bilby contributes to your research, please cite the papers below.
+  papers:
+    - authors: Ashton et al.
+      title: "BILBY: A user-friendly Bayesian inference library for gravitational-wave astronomy"
+      journal: ApJS 241, 27 (2019)
+      href: https://doi.org/10.3847/1538-4365/ab06fc
+      arxiv: "1811.02042"
+    - authors: Romero-Shaw et al.
+      title: "Bayesian inference for compact binary coalescences with BILBY: validation and application to the first LIGO-Virgo gravitational-wave transient catalogue"
+      journal: MNRAS 499, 3295 (2020)
+      href: https://doi.org/10.1093/mnras/staa2850
+      arxiv: "2006.00714"
+  more: https://bilby-dev.github.io/bilby/citing-bilby.html
+
+community:
+  - {title: Ask a question, text: "Start a thread in GitHub Discussions.", href: "https://github.com/bilby-dev/bilby/discussions"}
+  - {title: Report a bug, text: "Open an issue on GitHub.", href: "https://github.com/bilby-dev/bilby/issues"}
+  - {title: Contribute, text: "Read the contribution guide.", href: "https://bilby-dev.github.io/bilby/contribution-guide.html"}
+  - {title: Write a sampler plugin, text: "Start from the sampler template.", href: "https://github.com/bilby-dev/sampler-template"}
+
+# The short snippet shown in the hero.
+hero_snippet: |
+  import bilby
+
+  likelihood = bilby.likelihood.GaussianLikelihood(
+      x, y, model, sigma
+  )
+  priors = dict(
+      m=bilby.prior.Uniform(0, 5, "m"),
+      c=bilby.prior.Uniform(-5, 5, "c"),
+  )
+  result = bilby.run_sampler(
+      likelihood, priors, sampler="dynesty"
+  )
+  result.plot_corner()
+
+# Examples pre-loaded into the in-browser runner; each becomes an option in
+# its example picker. Each file is plain Python, runnable with a normal install.
+try_examples:
+  - name: Fit a straight line
+    file: static/py/linear_regression.py
+  - name: Sample the bilby logo
+    file: static/py/sample_letter.py
+  - name: Compare two models
+    file: static/py/model_comparison.py
+
+# Pyodide release used by the in-browser runner. A daily workflow checks that
+# bilby still imports with it (see .github/workflows/check.yml).
+pyodide:
+  version: "0.29.5"
+  pyodide_packages: [micropip, numpy, scipy, matplotlib, pandas, h5py, bilby-cython, tqdm, attrs]
+
+automation:
+  # Fetch the latest version from PyPI at build time (falls back to `fallback_version`).
+  pypi_package: bilby
+  fallback_version: "2.8.2"
+  # Turn the newest GitHub releases into announcements automatically.
+  release_announcements:
+    repo: bilby-dev/bilby
+    count: 3
+    max_age_days: 365
+  # How many announcements to show on the page (newest first, pinned ones on top).
+  max_announcements: 4
+
+footer:
+  license: bilby is released under the MIT licence.
+  note: This site is built automatically from github.com/bilby-dev/bilby-dev.github.io.

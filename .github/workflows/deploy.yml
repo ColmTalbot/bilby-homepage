@@ -1,0 +1,50 @@
+# Builds the site and publishes it to GitHub Pages.
+# Repository settings: Pages > Build and deployment > Source = "GitHub Actions".
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "17 6 * * *" # daily: picks up new releases and expires old announcements
+  workflow_dispatch:
+  repository_dispatch:
+    types: [bilby-release] # sent by bilby's release workflow (see README)
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      # --all also publishes every design under /preview/ while a design is chosen
+      - run: python build.py --all
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
