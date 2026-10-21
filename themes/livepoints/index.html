@@ -4,7 +4,6 @@
 {% extends "base.html" %}
 {% from "macros.html" import icon, ecosystem, banner, install_tabs, announcement_list, runner, citations, community_icon %}
 {% block theme_color %}#061528{% endblock %}
-{% block fonts %}https://fonts.googleapis.com/css2?family=Fredoka:wght@700&family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap{% endblock %}
 {% block body %}
 {{ banner(pinned) }}
 <div class="dark">
@@ -108,7 +107,7 @@
       <p class="kicker">In your browser</p>
       <h2 id="try-title">Edit. Run. Sample.</h2>
       <p class="section-lede">This runs real bilby, compiled to WebAssembly with Pyodide. The first run downloads Python and bilby; later runs start straight away.</p>
-      {{ runner(examples, site) }}
+      {{ runner(examples, site, release) }}
     </div>
   </section>
 

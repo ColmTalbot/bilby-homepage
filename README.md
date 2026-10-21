@@ -63,6 +63,8 @@ content/announcements/     one Markdown file per announcement
 themes/_shared/            page skeleton and macros shared by every design
 themes/<design>/           index.html + style.css (+ any assets) for one design
 static/                    logo, gallery figures, shared CSS/JS, in-browser examples
+static/fonts/              self-hosted web fonts per design, with their licences
+scripts/fetch_fonts.py     re-downloads static/fonts/ after a design's fonts change
 build.py                   renders everything into _site/
 tests/run_examples.mjs     runs the in-browser examples under Pyodide in Node
 ```
@@ -86,6 +88,20 @@ inside a Web Worker (`static/js/worker.js`). Nothing downloads until someone pre
 `static/py/_runner.py` silences progress bars and warnings and collects matplotlib figures.
 The Pyodide version is set in `site.yaml`. When you change it, the Check workflow confirms
 every example still runs.
+
+## Security
+
+- **Content Security Policy:** every page carries a strict policy (in
+  `themes/_shared/base.html`). It allows scripts, styles, fonts and images only from this
+  site, plus `data:` images for the runner's figures. To use an external resource, such as
+  an image hosted elsewhere, add its origin to the policy.
+- **Fonts:** fonts are self-hosted, so loading the page contacts no third party. Only the
+  in-browser runner, once someone presses Run, downloads Pyodide from jsDelivr and bilby
+  from PyPI. It installs exactly the bilby version the site was built against.
+- **Release data:** release announcements only use tags that look like versions and links
+  to github.com.
+- **Workflows:** jobs run with read-only permissions, except the one that publishes to
+  Pages. Actions are pinned to commit SHAs, and Dependabot keeps the pins current.
 
 ## Automation
 

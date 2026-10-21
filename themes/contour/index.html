@@ -3,7 +3,6 @@
 {% extends "base.html" %}
 {% from "macros.html" import icon, ecosystem, banner, install_tabs, announcement_list, runner, citations, hero_code, community_icon %}
 {% from "art.html" import corner_art %}
-{% block fonts %}https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap{% endblock %}
 {% block body %}
 {{ banner(pinned) }}
 <header class="site-header">
@@ -69,7 +68,7 @@
         <h2 id="try-title" class="section-title">Try bilby in your browser</h2>
         <p>Edit the code and press Run. Python and bilby run locally in your browser with Pyodide, with nothing to install.</p>
       </div>
-      {{ runner(examples, site) }}
+      {{ runner(examples, site, release) }}
     </div>
   </section>
 
