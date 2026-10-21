@@ -20,14 +20,15 @@ OUT = ROOT / "static" / "fonts"
 # Google Fonts CSS2 query per design, and each family's directory in
 # github.com/google/fonts (for its licence).
 THEMES = {
-    "contour": "family=Fredoka:wght@500;600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600",
+    "contour": "family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700"
+               "&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600",
     "livepoints": "family=Fredoka:wght@700&family=Space+Grotesk:wght@500;600;700"
                   "&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;600",
     "fieldguide": "family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700"
                   "&family=Source+Sans+3:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600",
 }
 LICENCES = {
-    "Fredoka": "ofl/fredoka", "Inter": "ofl/inter", "JetBrains Mono": "ofl/jetbrainsmono",
+    "Fredoka": "ofl/fredoka", "JetBrains Mono": "ofl/jetbrainsmono",
     "Space Grotesk": "ofl/spacegrotesk", "IBM Plex Sans": "ofl/ibmplexsans",
     "Source Serif 4": "ofl/sourceserif4", "Source Sans 3": "ofl/sourcesans3",
 }

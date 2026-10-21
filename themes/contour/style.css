@@ -16,6 +16,8 @@
   --card: #ffffff;
   --shadow: 0 1px 2px #0b25400d, 0 8px 28px -8px #0b254026;
   --radius: 14px;
+  --sans: "Source Sans 3", system-ui, sans-serif;
+  --serif: "Source Serif 4", Georgia, serif;
   --c1: var(--blue-700); --c2: var(--blue-500); --c3: var(--blue-200); --axis: #b9cfe3;
 }
 @media (prefers-color-scheme: dark) {
@@ -29,13 +31,13 @@
 
 body {
   background: var(--bg); color: var(--ink);
-  font: 400 17px/1.65 Inter, system-ui, sans-serif;
+  font: 400 17.5px/1.65 var(--sans);
   -webkit-font-smoothing: antialiased;
 }
 a { color: var(--blue-700); }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) a { color: #8fc0ea; } }
 .wrap { width: min(1180px, 100% - 32px); margin-inline: auto; }
-h1, h2, h3, .wordmark { font-family: Fredoka, Inter, sans-serif; font-weight: 600; letter-spacing: -.01em; line-height: 1.15; }
+h1, h2, h3, .wordmark { font-family: var(--serif); font-weight: 600; letter-spacing: -.01em; line-height: 1.15; }
 .icon { flex: none; }
 
 /* ------------------------------------------------------------- banner */
@@ -158,7 +160,7 @@ h1, h2, h3, .wordmark { font-family: Fredoka, Inter, sans-serif; font-weight: 60
 }
 .eco-item:hover { border-color: var(--blue-300); }
 .eco-category { font-size: .75rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--blue-500); }
-.eco-name { font: 600 1.3rem Fredoka, sans-serif; color: var(--ink) !important; text-decoration: none; }
+.eco-name { font: 600 1.3rem var(--serif); color: var(--ink) !important; text-decoration: none; }
 .eco-name::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
 .eco-name:hover { text-decoration: underline; }
 .eco-text { margin: 0 0 4px; color: var(--muted); font-size: .95rem; flex: 1; }
@@ -220,7 +222,7 @@ h1, h2, h3, .wordmark { font-family: Fredoka, Inter, sans-serif; font-weight: 60
 .footer-brand .wordmark { font-size: 1.6rem; color: #fff; }
 .footer-brand p { margin: 6px 0 0; }
 .footer-links { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-.footer-links h3 { margin: 0 0 12px; font-family: Inter, sans-serif; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: #8fb3d6; }
+.footer-links h3 { margin: 0 0 12px; font-family: var(--sans); font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: #8fb3d6; }
 .footer-links a { display: block; color: #e6eff8; text-decoration: none; padding: 3px 0; }
 .footer-links a:hover { text-decoration: underline; }
 .footer-note { margin-top: 48px; padding-top: 20px; border-top: 1px solid #ffffff1f; color: #8fb3d6; font-size: .82rem; }
