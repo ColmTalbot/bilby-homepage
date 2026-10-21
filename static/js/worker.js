@@ -1,5 +1,6 @@
 // Runs Pyodide + bilby off the main thread for static/js/try-bilby.js.
-//   in:  {type: "init", pyodide, packages, runner}  (runner: source of static/py/_runner.py)
+//   in:  {type: "init", pyodide, bilby, packages, runner}  (bilby: the exact version to
+//        install, as built into the page; runner: source of static/py/_runner.py)
 //        {type: "run", code}
 //   out: {type: "status", text} | {type: "ready", version} | {type: "stream", text}
 //        {type: "image", png} | {type: "done", seconds} | {type: "error", text}
@@ -9,7 +10,7 @@ let pyodide = null;
 let ready = null;
 const post = (type, data = {}) => postMessage({ type, ...data });
 
-async function init({ pyodide: version, packages, runner }) {
+async function init({ pyodide: version, bilby, packages, runner }) {
   importScripts(`https://cdn.jsdelivr.net/pyodide/v${version}/full/pyodide.js`);
   post("status", { text: "Starting Python" });
   pyodide = await loadPyodide();
@@ -17,8 +18,9 @@ async function init({ pyodide: version, packages, runner }) {
   pyodide.setStderr({ batched: (text) => post("stream", { text }) });
   post("status", { text: "Loading numpy, scipy and matplotlib" });
   await pyodide.loadPackage(packages, { messageCallback: () => {} });
-  post("status", { text: "Installing bilby from PyPI" });
-  await pyodide.pyimport("micropip").install("bilby");
+  // The exact release the site was built against, not whatever PyPI serves now
+  post("status", { text: `Installing bilby ${bilby} from PyPI` });
+  await pyodide.pyimport("micropip").install(`bilby==${bilby}`);
   post("status", { text: "Importing bilby" });
   await pyodide.runPythonAsync(runner);
   post("ready", { version: pyodide.globals.get("bilby_version")() });
