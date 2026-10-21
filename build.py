@@ -19,7 +19,7 @@ import json
 import os
 import re
 import shutil
-import subprocess
+import subprocess  # nosec B404: used only to re-run this script, without a shell
 import sys
 import threading
 import time
@@ -45,11 +45,13 @@ TODAY = dt.date.today()
 
 
 def fetch_json(url, accept="application/json"):
+    if not url.startswith("https://"):
+        raise ValueError(f"refusing to fetch non-https URL {url!r}")
     headers = {"Accept": accept, "User-Agent": "bilby-homepage-build"}
     if url.startswith("https://api.github.com/") and os.environ.get("GITHUB_TOKEN"):
         headers["Authorization"] = f"Bearer {os.environ['GITHUB_TOKEN']}"  # higher rate limit in CI
     request = urllib.request.Request(url, headers=headers)
-    with urllib.request.urlopen(request, timeout=15) as response:
+    with urllib.request.urlopen(request, timeout=15) as response:  # nosec B310: https only, checked above
         body = response.read().decode()
     return body if accept != "application/json" else json.loads(body)
 
@@ -63,6 +65,8 @@ def load_live(site, offline):
     try:
         info = fetch_json(f"https://pypi.org/pypi/{auto['pypi_package']}/json")
         version = info["info"]["version"]
+        if not re.fullmatch(r"\d+(\.\d+)*([.+-]?[A-Za-z0-9]+)*", version):
+            raise ValueError(f"unexpected version string {version!r}")
         uploaded = info["releases"][version][0]["upload_time"][:10]
         live["release"] = {"version": version, "date": uploaded}
     except Exception as error:  # noqa: BLE001 - any failure means "use the cache"
@@ -95,6 +99,10 @@ def load_live(site, offline):
 # ------------------------------------------------------------ announcements
 
 FRONT_MATTER = re.compile(r"^---\s*\n(.*?)\n---\s*\n(.*)$", re.S)
+# Release announcements are built from GitHub data, which is not under this
+# repository's control: only plain version tags and github.com links are used.
+RELEASE_TAG = re.compile(r"v?\d+(\.\d+)*([.+-]?[A-Za-z0-9]+)*")
+RELEASE_URL = re.compile(r"https://github\.com/[\w.-]+/[\w.-]+/releases/tag/[\w.+-]+")
 
 
 def as_date(value):
@@ -126,7 +134,10 @@ def load_announcements(site, live):
             date = as_date(release["date"])
             if release["tag"] in known or (TODAY - date).days > auto.get("max_age_days", 365):
                 continue
-            version = release["tag"].lstrip("v")
+            if not (RELEASE_TAG.fullmatch(release["tag"]) and RELEASE_URL.fullmatch(release["url"])):
+                print(f"warning: skipping release with unexpected tag or URL: {release['tag']!r}", file=sys.stderr)
+                continue
+            version = html.escape(release["tag"].lstrip("v"))  # defence in depth: the body is rendered unescaped
             body = (f"bilby {version} is out. Upgrade with `pip install -U bilby` or from conda-forge. "
                     f"[Read the release notes]({release['url']}).")
             items.append({
@@ -213,7 +224,7 @@ def render_theme(theme, context, dest, previews=(), preview_base="../"):
         autoescape=True, trim_blocks=True, lstrip_blocks=True,
     )
     env.filters["date"] = lambda d, fmt="%-d %b %Y": d.strftime(fmt) if d else ""
-    env.filters["tojson_script"] = lambda v: json.dumps(v).replace("</", "<\\/")
+    env.filters["tojson_script"] = json_for_script
     env.filters["groupby_ordered"] = groupby_ordered
     dest.mkdir(parents=True, exist_ok=True)
     page_context = dict(context, theme=theme, previews=previews, preview_base=preview_base)
@@ -226,6 +237,13 @@ def render_theme(theme, context, dest, previews=(), preview_base="../"):
     (dest / "announcements.json").write_text(json.dumps(
         [{k: str(v) if isinstance(v, dt.date) else v for k, v in a.items()} for a in context["announcements"]],
         indent=1))
+
+
+def json_for_script(value):
+    """JSON safe to embed in a <script> element: no character in it can end
+    the element or change how the HTML parser reads it (e.g. "</", "<!--")."""
+    return (json.dumps(value).replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+            .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029"))
 
 
 def groupby_ordered(items, key):
@@ -319,7 +337,7 @@ def serve(port, offline):
                 last = current
                 # A fresh process, so edits to build.py itself take effect too;
                 # a failed build is reported and the server keeps running.
-                subprocess.run([sys.executable, __file__, "--all", "--offline"], check=False)
+                subprocess.run([sys.executable, __file__, "--all", "--offline"], check=False)  # nosec B603: fixed arguments
 
     threading.Thread(target=watch, daemon=True).start()
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(OUT))
