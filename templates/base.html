@@ -1,6 +1,5 @@
-{# Page skeleton shared by every theme. A theme's index.html extends this and
-   fills `theme_color` and `body`; its fonts are static/fonts/<theme>.css
-   (made by scripts/fetch_fonts.py). #}
+{# Page skeleton: index.html extends this and fills `body`. The fonts are
+   static/fonts/fonts.css (made by scripts/fetch_fonts.py). #}
 <!doctype html>
 <html lang="en">
 <head>
@@ -14,8 +13,8 @@
   <title>{{ site.title }}: {{ site.tagline }}</title>
   <meta name="description" content="{{ site.description }}">
   <link rel="canonical" href="{{ site.url }}/">
-  {% if site.preliminary %}<meta name="robots" content="noindex, nofollow">{% endif %}
-  <meta name="theme-color" content="{% block theme_color %}#12385c{% endblock %}">
+  {% if preliminary %}<meta name="robots" content="noindex, nofollow">{% endif %}
+  <meta name="theme-color" content="#12385c">
   <meta property="og:type" content="website">
   <meta property="og:title" content="{{ site.title }}: {{ site.tagline }}">
   <meta property="og:description" content="{{ site.description }}">
@@ -23,9 +22,9 @@
   <meta property="og:image" content="{{ site.url }}/static/img/bilby-logo.jpg">
   <link rel="icon" href="static/img/bilby-logo.jpg">
   <link rel="alternate" type="application/atom+xml" title="bilby news" href="feed.xml">
-  <link rel="stylesheet" href="static/fonts/{{ theme }}.css?v={{ build_stamp }}">
+  <link rel="stylesheet" href="static/fonts/fonts.css?v={{ build_stamp }}">
   <link rel="stylesheet" href="static/css/base.css?v={{ build_stamp }}">
-  <link rel="stylesheet" href="static/theme-style.css?v={{ build_stamp }}">
+  <link rel="stylesheet" href="static/css/style.css?v={{ build_stamp }}">
   <script type="application/ld+json">
   {{ {
     "@context": "https://schema.org", "@type": "SoftwareSourceCode", "name": "bilby",
@@ -35,18 +34,11 @@
   } | tojson_script | safe }}
   </script>
 </head>
-<body class="theme-{{ theme }}">
+<body>
   <a class="skip-link" href="#main">Skip to content</a>
-  {% if site.preliminary %}<div class="watermark" aria-hidden="true"></div>{% endif %}
+  {% if preliminary %}<div class="watermark" aria-hidden="true"></div>{% endif %}
   {% block body %}{% endblock %}
-  {% if previews %}
-  <nav class="preview-switcher" aria-label="Design previews">
-    <a href="{{ preview_base }}">All designs</a>
-    {% for name in previews %}<a href="{{ preview_base }}{{ name }}/"{% if name == theme %} aria-current="page"{% endif %}>{{ name }}</a>{% endfor %}
-  </nav>
-  {% endif %}
   <script src="static/js/site.js?v={{ build_stamp }}" defer></script>
   <script src="static/js/try-bilby.js?v={{ build_stamp }}" defer></script>
-  {% block scripts %}{% endblock %}
 </body>
 </html>

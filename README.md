@@ -15,11 +15,10 @@ this site links to them.
 | Hide an announcement later | Add `expires: YYYY-MM-DD`. The daily rebuild removes it after that date. |
 | Announce a release | Nothing. Each bilby release on GitHub becomes an announcement automatically. |
 | Change any text or link | Edit `content/site.yaml`. |
-| Add a package to the ecosystem section | Add an entry under `ecosystem.packages` in `content/site.yaml` (name, category, one-line text, link, optional repo). Packages are grouped by category in the order categories first appear. The "let us know" line under the list is `ecosystem.invite`. |
+| Add a package to the ecosystem section | Add an entry under `ecosystem.packages` in `content/site.yaml` (name, category, one-line text, link, optional repo). Packages appear in the order listed. The "let us know" line under the list is `ecosystem.invite`. |
 | Replace or remove the gallery | Edit `gallery` in `content/site.yaml` (images go in `static/img/`). Set `show_gallery: false` to hide the section and keep the entries. |
 | Change or add an in-browser example | Edit or add a file in `static/py/` and list it under `try_examples` in `content/site.yaml`. |
-| Launch (remove the "PRELIMINARY" watermark and let search engines index the site) | Set `preliminary: false` in `content/site.yaml`. |
-| Switch the design | Set `theme:` in `content/site.yaml` to `contour`, `livepoints` or `fieldguide`. |
+| Launch (remove the "Preliminary" watermark and let search engines index the site) | Nothing. Both happen automatically when the site is deployed at its `url` in `content/site.yaml` (https://bilby-dev.github.io). Deployed anywhere else, or built locally, it keeps the watermark. |
 
 An announcement looks like this:
 
@@ -46,13 +45,12 @@ python -m venv .venv && .venv/bin/pip install -r requirements.txt
 .venv/bin/python build.py serve
 ```
 
-Then open http://localhost:8000/ for the deployed design or http://localhost:8000/preview/
-to compare all three. The site rebuilds whenever a file changes. Other commands:
+Then open http://localhost:8000/. The site rebuilds whenever a file changes. Other commands:
 
 ```bash
-.venv/bin/python build.py            # build the deployed design into _site/
-.venv/bin/python build.py --all      # also build every design under _site/preview/
+.venv/bin/python build.py            # build the site into _site/
 .venv/bin/python build.py --offline  # don't contact PyPI/GitHub/doi.org; use .cache/
+.venv/bin/python build.py --host bilby-dev.github.io  # build it as deployed, without the watermark
 ```
 
 ## How it fits together
@@ -60,11 +58,10 @@ to compare all three. The site rebuilds whenever a file changes. Other commands:
 ```
 content/site.yaml          all text, links, features, samplers, ecosystem, gallery, citations, examples list
 content/announcements/     one Markdown file per announcement
-themes/_shared/            page skeleton and macros shared by every design
-themes/<design>/           index.html + style.css (+ any assets) for one design
-static/                    logo, gallery figures, shared CSS/JS, in-browser examples
-static/fonts/              self-hosted web fonts per design, with their licences
-scripts/fetch_fonts.py     re-downloads static/fonts/ after a design's fonts change
+templates/                 the page (index.html), its skeleton (base.html) and building blocks
+static/                    logo, gallery figures, CSS, JS, in-browser examples
+static/fonts/              self-hosted web fonts, with their licences
+scripts/fetch_fonts.py     re-downloads static/fonts/ after the fonts change
 build.py                   renders everything into _site/
 tests/run_examples.mjs     runs the in-browser examples under Pyodide in Node
 ```
@@ -92,7 +89,7 @@ every example still runs.
 ## Security
 
 - **Content Security Policy:** every page carries a strict policy (in
-  `themes/_shared/base.html`). It allows scripts, styles, fonts and images only from this
+  `templates/base.html`). It allows scripts, styles, fonts and images only from this
   site, plus `data:` images for the runner's figures. To use an external resource, such as
   an image hosted elsewhere, add its origin to the policy.
 - **Fonts:** fonts are self-hosted, so loading the page contacts no third party. Only the
@@ -108,8 +105,8 @@ every example still runs.
 - **Deploy** (`.github/workflows/deploy.yml`) builds and publishes on every push to
   `main`, daily (for new releases and expired announcements), on demand, and on a
   `bilby-release` repository dispatch.
-- **Check** (`.github/workflows/check.yml`) runs on pull requests and weekly. It builds all
-  designs, checks every link with lychee, and runs every in-browser example against the
+- **Check** (`.github/workflows/check.yml`) runs on pull requests and weekly. It builds the
+  site, checks every link with lychee, and runs every in-browser example against the
   newest bilby under the configured Pyodide. That catches a bilby release that breaks the
   runner before visitors do.
 - **Dependabot** keeps the Actions and Python dependencies current.

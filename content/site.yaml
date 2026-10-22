@@ -1,17 +1,12 @@
 # Everything the homepage says lives in this file and in content/announcements/.
-# Edit text here; the templates in themes/ only control presentation.
+# Edit text here; the page templates (templates/) only control presentation.
 # The build (build.py) also fills in live data: the latest release from PyPI and
 # recent GitHub releases (see `automation` below).
 
-# Which design is deployed at the site root. The others are still built under
-# /preview/<name>/ when running `python build.py --all`.
-theme: contour
-
-# While true, every page shows a "PRELIMINARY" watermark and asks search
-# engines not to index it. Set to false (or delete the line) at launch.
-preliminary: true
-
 title: bilby
+# Where the site is published. A build for anywhere else (a local preview, or
+# a copy deployed at another address) shows a "Preliminary" watermark on every
+# page and asks search engines not to index it.
 url: https://bilby-dev.github.io
 tagline: Bayesian inference made simple.
 description: >-
@@ -41,12 +36,6 @@ nav:
   - {label: News, href: "#news"}
   - {label: Community, href: "#community"}
 
-install:
-  - {name: pip, command: "pip install bilby"}
-  - {name: conda, command: "conda install -c conda-forge bilby"}
-  - {name: uv, command: "uv add bilby"}
-  - {name: "with GW extras", command: "pip install \"bilby[gw]\""}
-
 features:
   - title: Any sampler, one interface
     icon: shuffle
@@ -74,15 +63,6 @@ features:
       for hierarchical and population analyses with bilby.hyper.
     href: https://bilby-dev.github.io/bilby/bilby-output.html
 
-# Large link tiles ("Where next?"). Used most prominently by the field-guide design.
-destinations:
-  - {title: Getting started, text: "Install bilby and run your first fit.", href: "https://bilby-dev.github.io/bilby/basics-of-parameter-estimation.html", icon: rocket}
-  - {title: User guide, text: "Priors, likelihoods, samplers and output.", href: "https://bilby-dev.github.io/bilby/", icon: book}
-  - {title: Examples, text: "Runnable examples, in your browser.", href: "https://bilby-dev.github.io/examples/", icon: play}
-  - {title: API reference, text: "bilby.core, bilby.gw, bilby.hyper and more.", href: "https://bilby-dev.github.io/bilby/api/bilby.core.html", icon: code}
-  - {title: GW inference, text: "Compact binary coalescence parameter estimation.", href: "https://bilby-dev.github.io/bilby/compact-binary-coalescence-parameter-estimation.html", icon: wave}
-  - {title: Contribute, text: "Report bugs, write plugins, improve the docs.", href: "https://bilby-dev.github.io/bilby/contribution-guide.html", icon: heart}
-
 samplers:
   - {name: dynesty, kind: nested}
   - {name: bilby-mcmc, kind: MCMC}
@@ -98,8 +78,8 @@ samplers:
   - {name: DNest4, kind: diffusive nested, href: "https://github.com/bilby-dev/dnest4-bilby"}
 
 # Packages built on, or designed to work with, bilby. Each needs a name, a
-# one-line description, a link and a category; entries are grouped by category
-# in the order categories first appear. `repo` is optional.
+# one-line description, a link and a category (shown on its card); they appear
+# in the order listed. `repo` is optional.
 ecosystem:
   intro: >-
     bilby is the core of a family of packages for pipelines, population studies

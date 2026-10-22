@@ -33,11 +33,14 @@ jobs:
           python-version: "3.12"
           cache: pip
       - run: pip install -r requirements.txt
-      # --all also publishes every design under /preview/ while a design is chosen
-      - run: python build.py --all
+      - id: pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+      # Published anywhere but the address in content/site.yaml (`url`), the
+      # pages carry a "Preliminary" watermark and ask not to be indexed.
+      - run: python build.py --host "$PAGES_HOST"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+          PAGES_HOST: ${{ steps.pages.outputs.host }}
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
           path: _site

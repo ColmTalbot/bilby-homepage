@@ -1,5 +1,5 @@
-/* Structure shared by every theme. Themes set the custom properties below
-   (and anything else) in their own style.css. */
+/* Structure, the in-browser runner and the watermark; style.css sets the
+   look. The custom properties below colour the code and the runner. */
 
 :root {
   --code-font: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -59,14 +59,6 @@ pre, code { font-family: var(--code-font); }
 .copy.copied { opacity: 1; }
 .copy.copied svg { display: none; }
 .copy.copied::after { content: "✓"; font-weight: 700; }
-
-/* ----------------------------------------------------------------- tabs */
-.install-tabs { display: flex; flex-wrap: wrap; gap: 4px; }
-.install-tabs [role="tab"] { cursor: pointer; border: 0; background: none; }
-.install-panel { display: flex; align-items: center; gap: 8px; }
-.install-panel[hidden] { display: none; }
-.install-panel code { flex: 1; min-width: 0; overflow-x: auto; white-space: nowrap; }
-.install-panel .prompt { opacity: .5; user-select: none; }
 
 /* --------------------------------------------------------------- banner */
 .banner-inner { display: flex; align-items: center; gap: 12px; }
@@ -185,17 +177,3 @@ pre, code { font-family: var(--code-font); }
   color: rgb(214 48 49 / .16);
 }
 @media print { .watermark { position: absolute; } }
-
-/* ------------------------------------------------------ preview switcher */
-.preview-switcher {
-  position: fixed; z-index: 90; bottom: 16px; left: 50%; transform: translateX(-50%);
-  display: flex; gap: 2px; padding: 4px; border-radius: 999px;
-  background: #0b1626e6; backdrop-filter: blur(8px); box-shadow: 0 6px 24px #0005;
-  font: 600 13px/1 system-ui, sans-serif; max-width: calc(100vw - 32px); overflow-x: auto;
-}
-body .preview-switcher a {
-  color: #cfe0f0; text-decoration: none; padding: 8px 14px; border-radius: 999px;
-  text-transform: capitalize; white-space: nowrap;
-}
-body .preview-switcher a:hover { background: #ffffff1a; }
-body .preview-switcher a[aria-current] { background: #fff; color: #0b2540; }
