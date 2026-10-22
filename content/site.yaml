@@ -116,11 +116,11 @@ ecosystem:
       text: Configure and run bilby gravitational-wave analyses on a computing cluster from a single ini file.
       href: https://lscsoft.docs.ligo.org/bilby_pipe/master/index.html
       repo: https://git.ligo.org/lscsoft/bilby_pipe
-    - name: parallel_bilby
+    - name: cwinpy
       category: Gravitational waves
-      text: Run bilby gravitational-wave analyses across many CPUs with MPI.
-      href: https://lscsoft.docs.ligo.org/parallel_bilby/
-      repo: https://git.ligo.org/lscsoft/parallel_bilby
+      text: Inference for continuous gravitational-wave signals from pulsars, built on bilby.
+      href: https://cwinpy.readthedocs.io/
+      repo: https://github.com/cwinpy/cwinpy
     - name: bilby_tgr
       category: Gravitational waves
       text: Tests of general relativity with bilby.
