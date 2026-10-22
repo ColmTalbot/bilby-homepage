@@ -1,6 +1,6 @@
-// In-browser bilby runner and Python syntax highlighting, shared by all themes.
+// In-browser bilby runner and Python syntax highlighting.
 //
-// Markup (see themes/_shared/macros.html, `runner`):
+// Markup (see templates/macros.html, `runner`):
 //   [data-runner]            container; data-pyodide (version), data-packages (JSON)
 //     [data-runner-examples] <script type="application/json"> [{name, code}, ...]
 //     [data-runner-example]  <select> of examples

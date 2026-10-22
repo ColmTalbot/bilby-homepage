@@ -1,4 +1,5 @@
-/* Design 1, "Contour": light, airy, the logo's blues throughout. */
+/* The site's look: light, airy, the logo's blues throughout. Structure and
+   the in-browser runner are in base.css. */
 
 :root {
   --bg: #ffffff;

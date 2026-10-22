@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 """Build the bilby homepage.
 
-    python build.py                 # build the theme named in content/site.yaml into _site/
-    python build.py --all           # also build every theme under _site/preview/<theme>/
+    python build.py                 # build the site into _site/
     python build.py --offline       # don't fetch PyPI/GitHub/DOI data (use the cache)
-    python build.py serve           # build --all, serve on http://localhost:8000, rebuild on change
+    python build.py --host HOST     # the host the site is published at (see below)
+    python build.py serve           # build, serve on http://localhost:8000, rebuild on change
     python build.py new "Title"     # start a new announcement in content/announcements/
 
-Content lives in content/; presentation in themes/<name>/ (index.html +
-style.css) and themes/_shared/ (macros used by every theme); assets shared by
-all themes live in static/.
+Content lives in content/; the page templates in templates/; CSS, JavaScript,
+fonts and images in static/.
+
+Every page carries a "Preliminary" watermark and asks search engines not to
+index it, unless it is built with --host set to the host of `url` in
+content/site.yaml (the Deploy workflow passes the host GitHub Pages serves).
 """
 
 import argparse
@@ -23,6 +26,7 @@ import subprocess  # nosec B404: used only to re-run this script, without a shel
 import sys
 import threading
 import time
+import urllib.parse
 import urllib.request
 from pathlib import Path
 
@@ -32,7 +36,7 @@ from jinja2 import Environment, FileSystemLoader
 
 ROOT = Path(__file__).resolve().parent
 CONTENT = ROOT / "content"
-THEMES = ROOT / "themes"
+TEMPLATES = ROOT / "templates"
 STATIC = ROOT / "static"
 OUT = ROOT / "_site"
 CACHE = ROOT / ".cache" / "live.json"
@@ -196,8 +200,11 @@ def atom_feed(site, announcements):
 # -------------------------------------------------------------------- build
 
 
-def load_context(offline):
+def load_context(offline, host=None):
     site = yaml.safe_load((CONTENT / "site.yaml").read_text())
+    # Only the copy published at the site's own address is the real thing; a
+    # local build or a deployment anywhere else (e.g. a fork) is marked.
+    preliminary = host != urllib.parse.urlsplit(site["url"]).hostname
     live = load_live(site, offline)
     release = live.get("release") or {"version": site["automation"]["fallback_version"], "date": None}
     announcements = load_announcements(site, live)
@@ -208,7 +215,7 @@ def load_context(offline):
     for paper in site["citation"]["papers"]:
         paper["bibtex"] = format_bibtex(live.get("bibtex", {}).get(paper["href"].split("doi.org/")[-1]))
     return {
-        "site": site, "release": release, "examples": examples,
+        "site": site, "preliminary": preliminary, "release": release, "examples": examples,
         "announcements": announcements,
         "pinned": next((a for a in announcements if a.get("pinned")), None),
         "build_date": TODAY,
@@ -216,25 +223,18 @@ def load_context(offline):
     }
 
 
-def render_theme(theme, context, dest, previews=(), preview_base="../"):
-    """Render one theme into dest. `preview_base` is the path from this page
-    to the preview index (the switcher's links), when `previews` are listed."""
+def render(context):
     env = Environment(
-        loader=FileSystemLoader([THEMES / theme, THEMES / "_shared"]),
-        autoescape=True, trim_blocks=True, lstrip_blocks=True,
+        loader=FileSystemLoader(TEMPLATES), autoescape=True, trim_blocks=True, lstrip_blocks=True,
     )
     env.filters["date"] = lambda d, fmt="%-d %b %Y": d.strftime(fmt) if d else ""
     env.filters["tojson_script"] = json_for_script
-    env.filters["groupby_ordered"] = groupby_ordered
-    dest.mkdir(parents=True, exist_ok=True)
-    page_context = dict(context, theme=theme, previews=previews, preview_base=preview_base)
-    (dest / "index.html").write_text(env.get_template("index.html").render(page_context))
-    shutil.copytree(STATIC, dest / "static", dirs_exist_ok=True)
-    for asset in (THEMES / theme).iterdir():
-        if asset.name != "index.html":
-            shutil.copy2(asset, dest / "static" / f"theme-{asset.name}")
-    (dest / "feed.xml").write_text(atom_feed(context["site"], context["announcements"]))
-    (dest / "announcements.json").write_text(json.dumps(
+    OUT.mkdir()
+    (OUT / "index.html").write_text(env.get_template("index.html").render(context))
+    shutil.copytree(STATIC, OUT / "static")
+    (OUT / ".nojekyll").touch()
+    (OUT / "feed.xml").write_text(atom_feed(context["site"], context["announcements"]))
+    (OUT / "announcements.json").write_text(json.dumps(
         [{k: str(v) if isinstance(v, dt.date) else v for k, v in a.items()} for a in context["announcements"]],
         indent=1))
 
@@ -246,55 +246,14 @@ def json_for_script(value):
             .replace("\u2028", "\\u2028").replace("\u2029", "\\u2029"))
 
 
-def groupby_ordered(items, key):
-    """Like Jinja's groupby, but groups keep the order they first appear in."""
-    groups = {}
-    for item in items:
-        groups.setdefault(item[key], []).append(item)
-    return [{"grouper": k, "list": v} for k, v in groups.items()]
-
-
-def available_themes():
-    return sorted(p.name for p in THEMES.iterdir() if p.is_dir() and not p.name.startswith("_"))
-
-
-def build(all_themes=False, offline=False):
-    context = load_context(offline)
+def build(offline=False, host=None):
+    context = load_context(offline, host)
     if OUT.exists():
         shutil.rmtree(OUT)
-    themes = available_themes()
-    previews = themes if all_themes else ()
-    render_theme(context["site"]["theme"], context, OUT, previews, preview_base="preview/")
-    (OUT / ".nojekyll").touch()
-    if all_themes:
-        for theme in themes:
-            render_theme(theme, context, OUT / "preview" / theme, previews)
-        (OUT / "preview" / "index.html").write_text(preview_index(themes, context["site"]["theme"]))
-    print(f"built {'all themes' if all_themes else context['site']['theme']} into {OUT.relative_to(ROOT)}/ "
-          f"(bilby {context['release']['version']}, {len(context['announcements'])} announcements)")
-
-
-def preview_index(themes, current):
-    cards = "\n".join(
-        f'<a href="{t}/"><iframe src="{t}/" loading="lazy" tabindex="-1" title="{t}"></iframe>'
-        f'<span>{t}{" (deployed)" if t == current else ""}</span></a>'
-        for t in themes
-    )
-    return f"""<!doctype html><html lang="en"><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1"><title>bilby homepage designs</title>
-<link rel="icon" href="../static/img/bilby-logo.jpg">
-<style>
-body{{margin:0;font:16px/1.5 system-ui,sans-serif;background:#eef4fa;color:#0b2540;padding:32px 16px}}
-h1{{margin:0 0 4px;font-size:1.6rem}} p{{margin:0 0 24px;color:#3b5672}}
-main{{max-width:1400px;margin:auto}} .grid{{display:grid;gap:24px;grid-template-columns:repeat(auto-fit,minmax(min(100%,400px),1fr))}}
-a{{display:block;color:inherit;text-decoration:none;background:#fff;border-radius:12px;overflow:hidden;
-box-shadow:0 1px 3px #0b254022,0 8px 24px #0b254014;transition:transform .15s}} a:hover{{transform:translateY(-3px)}}
-iframe{{width:250%;height:1750px;border:0;transform:scale(.4);transform-origin:0 0;margin-bottom:-1050px;pointer-events:none;display:block}}
-span{{display:block;padding:12px 16px;font-weight:600;border-top:1px solid #d6e4f0;text-transform:capitalize}}
-</style><main><h1>bilby homepage: design previews</h1>
-<p>Each design renders the same content from <code>content/</code>. Set <code>theme:</code> in <code>content/site.yaml</code> to choose what is deployed.</p>
-<div class="grid">{cards}</div></main></html>
-"""
+    render(context)
+    print(f"built {OUT.relative_to(ROOT)}/ (bilby {context['release']['version']}, "
+          f"{len(context['announcements'])} announcements"
+          f"{', preliminary' if context['preliminary'] else ''})")
 
 
 # --------------------------------------------------------------- commands
@@ -321,8 +280,8 @@ def serve(port, offline):
     import functools
     import http.server
 
-    build(all_themes=True, offline=offline)
-    watched = [CONTENT, THEMES, STATIC, Path(__file__)]
+    build(offline=offline)
+    watched = [CONTENT, TEMPLATES, STATIC, Path(__file__)]
 
     def snapshot():
         return {p: p.stat().st_mtime for root in watched
@@ -337,12 +296,12 @@ def serve(port, offline):
                 last = current
                 # A fresh process, so edits to build.py itself take effect too;
                 # a failed build is reported and the server keeps running.
-                subprocess.run([sys.executable, __file__, "--all", "--offline"], check=False)  # nosec B603: fixed arguments
+                subprocess.run([sys.executable, __file__, "--offline"], check=False)  # nosec B603: fixed arguments
 
     threading.Thread(target=watch, daemon=True).start()
     handler = functools.partial(http.server.SimpleHTTPRequestHandler, directory=str(OUT))
     with http.server.ThreadingHTTPServer(("127.0.0.1", port), handler) as httpd:
-        print(f"serving http://localhost:{port}/  (designs: http://localhost:{port}/preview/)")
+        print(f"serving http://localhost:{port}/")
         httpd.serve_forever()
 
 
@@ -350,8 +309,9 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("command", nargs="?", default="build", choices=["build", "serve", "new"])
     parser.add_argument("title", nargs="?", help="title for `new`")
-    parser.add_argument("--all", action="store_true", help="also build every theme under _site/preview/")
     parser.add_argument("--offline", action="store_true", help="use cached live data only")
+    parser.add_argument("--host", help="host the site is published at; unless it is the host of `url` in "
+                                       "content/site.yaml, pages are marked preliminary")
     parser.add_argument("--port", type=int, default=8000)
     args = parser.parse_args()
     if args.command == "new":
@@ -361,7 +321,7 @@ def main():
     elif args.command == "serve":
         serve(args.port, args.offline)
     else:
-        build(all_themes=args.all, offline=args.offline)
+        build(offline=args.offline, host=args.host)
 
 
 if __name__ == "__main__":

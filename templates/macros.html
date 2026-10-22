@@ -1,5 +1,5 @@
-{# Building blocks shared by every theme. Each renders semantic markup with
-   stable class names; the theme's style.css decides how it looks. #}
+{# Building blocks for index.html. Each renders semantic markup with stable
+   class names; static/css/ decides how it looks. #}
 
 {% macro icon(name, size=24) -%}
 <svg class="icon icon-{{ name }}" width="{{ size }}" height="{{ size }}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -43,23 +43,7 @@
 {% endif %}
 {%- endmacro %}
 
-{% macro install_tabs(site, id="install") -%}
-<div class="install" data-tabs>
-  <div class="install-tabs" role="tablist" aria-label="Install bilby with">
-    {% for option in site.install %}
-    <button type="button" role="tab" id="{{ id }}-tab-{{ loop.index }}" aria-controls="{{ id }}-panel-{{ loop.index }}" aria-selected="{{ 'true' if loop.first else 'false' }}"{% if not loop.first %} tabindex="-1"{% endif %}>{{ option.name }}</button>
-    {% endfor %}
-  </div>
-  {% for option in site.install %}
-  <div class="install-panel" role="tabpanel" id="{{ id }}-panel-{{ loop.index }}" aria-labelledby="{{ id }}-tab-{{ loop.index }}"{% if not loop.first %} hidden{% endif %}>
-    <code><span class="prompt" aria-hidden="true">$</span> <span id="{{ id }}-cmd-{{ loop.index }}">{{ option.command }}</span></code>
-    <button type="button" class="copy" data-copy="#{{ id }}-cmd-{{ loop.index }}" aria-label="Copy command">{{ icon("copy", 18) }}</button>
-  </div>
-  {% endfor %}
-</div>
-{%- endmacro %}
-
-{% macro announcement_list(items, site, show_body=true) -%}
+{% macro announcement_list(items, site) -%}
 <ol class="news-list" reversed>
   {% for item in items %}
   <li class="news-item{% if item.pinned %} is-pinned{% endif %}" id="news-{{ item.slug }}">
@@ -68,7 +52,7 @@
       {% if item.tag %}<span class="news-tag">{{ item.tag }}</span>{% endif %}
     </div>
     <h3 class="news-title">{% if item.link %}<a href="{{ item.link }}">{{ item.title }}</a>{% else %}{{ item.title }}{% endif %}</h3>
-    {% if show_body %}<div class="news-body">{{ item.html | safe }}</div>{% else %}<p class="news-body">{{ item.summary }}</p>{% endif %}
+    <div class="news-body">{{ item.html | safe }}</div>
   </li>
   {% else %}
   <li class="news-item news-empty">No announcements right now. Release notes are on <a href="{{ site.links.github }}/releases">GitHub</a>.</li>
@@ -76,7 +60,7 @@
 </ol>
 {%- endmacro %}
 
-{% macro runner(examples, site, release, docs_label="Open the full examples site") -%}
+{% macro runner(examples, site, release) -%}
 <div class="runner" data-runner data-state="idle" data-pyodide="{{ site.pyodide.version }}" data-bilby="{{ release.version }}" data-packages='{{ site.pyodide.pyodide_packages | tojson }}'>
   <script type="application/json" data-runner-examples>{{ examples | tojson_script | safe }}</script>
   <div class="runner-bar">
@@ -102,7 +86,7 @@
       <pre class="runner-log" data-runner-log hidden></pre>
     </div>
   </div>
-  <p class="runner-foot">Runs on one CPU core in your browser. For more examples, including gravitational-wave analyses, <a href="{{ site.links.examples }}">{{ docs_label | lower }}</a>.</p>
+  <p class="runner-foot">Runs on one CPU core in your browser. For more examples, including gravitational-wave analyses, <a href="{{ site.links.examples }}">open the full examples site</a>.</p>
 </div>
 {%- endmacro %}
 
@@ -130,30 +114,17 @@
 <pre class="hero-code"><code data-highlight>{{ site.hero_snippet }}</code></pre>
 {%- endmacro %}
 
-{# Ecosystem packages. `grouped=true` renders one list per category. #}
+{# Ecosystem packages, one card each, in the order listed in site.yaml. #}
 {% macro ecosystem_invite(site) -%}
 {% if site.ecosystem.invite %}
 <p class="eco-invite">{{ icon("plug", 18) }} <span>{{ site.ecosystem.invite.text }}</span> <a href="{{ site.ecosystem.invite.href }}">{{ site.ecosystem.invite.link_text }} {{ icon("arrow", 14) }}</a></p>
 {% endif %}
 {%- endmacro %}
 
-{% macro ecosystem(site, grouped=false) -%}
-{% if grouped %}
-<div class="eco-groups">
-  {% for group in site.ecosystem.packages | groupby_ordered("category") %}
-  <section class="eco-group">
-    <h3 class="eco-group-title">{{ group.grouper }}</h3>
-    <ul class="eco-list">
-      {% for pkg in group.list %}{{ ecosystem_item(pkg) }}{% endfor %}
-    </ul>
-  </section>
-  {% endfor %}
-</div>
-{% else %}
+{% macro ecosystem(site) -%}
 <ul class="eco-list">
   {% for pkg in site.ecosystem.packages %}{{ ecosystem_item(pkg) }}{% endfor %}
 </ul>
-{% endif %}
 {{ ecosystem_invite(site) }}
 {%- endmacro %}
 
