@@ -2,7 +2,6 @@
 title: Welcome to the new bilby homepage
 date: 2026-10-21
 tag: Site
-pinned: true
 expires: 2026-12-31
 ---
 
